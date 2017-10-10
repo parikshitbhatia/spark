@@ -21,7 +21,7 @@ import sys
 from operator import add
 
 from pyspark.sql import SparkSession
-
+from pyspark.conf import SparkConf 
 
 if __name__ == "__main__":
     if len(sys.argv) != 2:
@@ -31,9 +31,11 @@ if __name__ == "__main__":
     spark = SparkSession\
         .builder\
         .appName("PythonWordCount")\
+        .conf(conf=SparkConf())\
         .getOrCreate()
 
-    lines = spark.read.text(sys.argv[1]).rdd.map(lambda r: r[0])
+    wordCountFile = "https://raw.githubusercontent.com/apache/spark/master/examples/src/main/python/pi.py";    
+    lines = spark.read.text(wordCountFile).rdd.map(lambda r: r[0])
     counts = lines.flatMap(lambda x: x.split(' ')) \
                   .map(lambda x: (x, 1)) \
                   .reduceByKey(add)
